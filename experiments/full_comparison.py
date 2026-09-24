@@ -1,23 +1,3 @@
-"""
-Full comparison — produces the data for all three of Cen's tables in one run.
-
-For each dataset x classifier, evaluates FIVE configurations:
-  1. No selection (benchmark)  - all genes, no filter/DE/HC
-  2. Filter + Long DE
-  3. Filter + Short DE
-  4. Filter + Short DE + HC
-  5. Filter + HC               - HC directly after filter, no DE
-
-Records BOTH accuracy and macro-F1, across several seeds (for p-values).
-Everything runs inside leakage-free nested, stratified k-fold CV.
-
-Results are appended to results_full.csv AS THEY COMPLETE, so an interrupted
-run keeps its progress. Re-running skips nothing automatically - delete the CSV
-to start fresh.
-
-Run on your machine (this is a long run - leave it going):
-    python3 experiments/full_comparison.py
-"""
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
@@ -56,6 +36,9 @@ DATASETS = {
 }
 SEEDS = [0, 1, 2]
 OUT = "results_full.csv"
+
+if os.path.exists(OUT):
+    os.remove(OUT)
 
 def load(path, impute):
     df = pd.read_csv(path, na_values=["?"], low_memory=False)

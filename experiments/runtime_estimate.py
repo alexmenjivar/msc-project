@@ -1,15 +1,4 @@
-"""
-Runtime estimate for the DE and HC feature-selection stages.
 
-Times a single run of DE and of HC on each dataset, at the settings used in
-the experiments. Reports seconds per run, and scales up to estimate the cost
-of a full experiment (all classifiers x configurations x seeds x folds).
-
-The running time depends heavily on how many genes survive the filter
-(CNS ~356, Lung ~630, Breast ~1,200), because DE and HC search within those.
-
-Run:  python3 experiments/runtime_estimate.py
-"""
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
