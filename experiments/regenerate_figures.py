@@ -76,21 +76,49 @@ for name,(path,impute,folds,sg,pop,steps,labels) in CFG.items():
     X, y = load(path, impute)
     outer = StratifiedKFold(folds, shuffle=True, random_state=SEED)
     allt, allp = [], []
+
     for tr,te in outer.split(X,y):
         Xtr,Xte,ytr,yte = X[tr],X[te],y[tr],y[te]
+
         if impute:
-            keep=~np.isnan(Xtr).all(axis=0); Xtr,Xte=Xtr[:,keep],Xte[:,keep]
-            imp=SimpleImputer(strategy="median").fit(Xtr); Xtr,Xte=imp.transform(Xtr),imp.transform(Xte)
+            keep=~np.isnan(Xtr).all(axis=0)
+            Xtr,Xte=Xtr[:,keep],Xte[:,keep]
+            imp=SimpleImputer(strategy="median").fit(Xtr)
+            Xtr,Xte=imp.transform(Xtr),imp.transform(Xte)
+
         k=max(1,int(Xtr.shape[1]*0.05))
-        sel=SelectKBest(partial(mi,seed=SEED),k=k).fit(Xtr,ytr); fidx=sel.get_support(indices=True); Xf=Xtr[:,fidx]
-        de_mask,_=differential_evolution(Xf,ytr,generations=sg,pop_size=pop,seed=SEED)
-        hc_mask,_=hill_climbing(de_mask,Xf,ytr,seed=SEED,max_steps=steps)
+        sel=SelectKBest(partial(mi,seed=SEED),k=k).fit(Xtr,ytr)
+        fidx=sel.get_support(indices=True)
+        Xf=Xtr[:,fidx]
+
+        de_mask,_=differential_evolution(
+            Xf,ytr,generations=sg,pop_size=pop,seed=SEED
+        )
+        hc_mask,_=hill_climbing(
+            de_mask,Xf,ytr,seed=SEED,max_steps=steps
+        )
+
         idx=fidx[hc_mask==1]
-        m=Pipeline([("s",StandardScaler()),("svm",SVC(kernel="linear",random_state=SEED))]).fit(Xtr[:,idx],ytr)
-        allt.extend(yte); allp.extend(m.predict(Xte[:,idx]))
-    cm=confusion_matrix(allt,allp,labels=labels)
+
+        m=Pipeline([
+            ("s",StandardScaler()),
+            ("svm",SVC(kernel="linear",random_state=SEED))
+        ]).fit(Xtr[:,idx],ytr)
+
+        allt.extend(yte)
+        allp.extend(m.predict(Xte[:,idx]))
+
+    cm = confusion_matrix(allt, allp, labels=labels)
     print(f"  {name}: {cm.tolist()}")
-    plot_cm(cm, labels, f"Confusion matrix \u2014 {name} (SVM)", f"cm_{name.lower()}.png")
+
+    display_labels = ["Class 0", "Class 1"] if name == "CNS" else labels
+
+    plot_cm(
+        cm,
+        display_labels,
+        f"Confusion matrix — {name} (SVM)",
+        f"cm_{name.lower()}.png"
+    )
 
 print("\nSaved: cm_cns.png, cm_lung.png, cm_breast.png")
 print("Use the gene counts printed above to update the gene-subset chart.")
