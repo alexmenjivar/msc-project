@@ -47,9 +47,6 @@ for name,(path,impute,gen,pop,steps) in DATASETS.items():
 
 # scale-up estimate
 print("\n--- Full-experiment estimate ---")
-print("A full run = 5 classifiers dont affect DE/HC (search is classifier-independent")
-print("here), but each configuration x seed x outer-fold re-runs DE and/or HC.")
-print("Approx per dataset: (configs using DE or HC) x seeds x folds x (DE+HC time).\n")
 SEEDS=3
 for name,(ng,de_t,hc_t) in results.items():
     folds = 3 if name=="Breast" else 5
@@ -59,5 +56,3 @@ for name,(ng,de_t,hc_t) in results.items():
     total = (de_runs*de_t + hc_runs*hc_t)/60
     print(f"{name:8s}: ~{de_runs} DE runs + ~{hc_runs} HC runs  ->  ~{total:.0f} min")
 print("\n(Estimates are approximate; actual time varies with machine and load.)")
-print("A full-scale run with more seeds/generations was left as future work due to")
-print("the computational cost of DE and HC on the large filtered gene sets.")

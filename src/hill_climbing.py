@@ -70,11 +70,11 @@ if __name__ == "__main__":
     X_filtered = SelectKBest(mutual_info_classif, k=k).fit_transform(X_full, y)
     print(f"After filter: {X_filtered.shape[1]} genes\n")
 
-    print("Stage 2 - Differential Evolution:")
+    print("Differential Evolution:")
     de_mask, de_score = differential_evolution(X_filtered, y)
     print(f"DE result: accuracy {1-de_score:.3f}, genes = {int(de_mask.sum())}\n")
 
-    print("Stage 3 - Hill Climbing (refining DE's subset):")
+    print("Hill Climbing (refining DE's subset):")
     hc_mask, hc_score = hill_climbing(de_mask, X_filtered, y)
 
     print(f"\n--- Summary ---")

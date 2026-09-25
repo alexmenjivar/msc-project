@@ -79,4 +79,3 @@ if __name__ == "__main__":
 
     print(f"\nBest subset: {int(best_mask.sum())} genes, "
           f"accuracy {1-best_score:.3f}")
-    print("Compare to: baseline 0.717, filter-only 0.633")

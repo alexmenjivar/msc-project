@@ -1,15 +1,3 @@
-"""
-Regenerate all supporting numbers (gene counts + confusion matrices) using the
-SAME settings as full_comparison.py, so every figure is consistent with the
-tables. Run on your machine; it prints the numbers and saves the confusion
-matrix images.
-
-Settings match full_comparison.py exactly:
-  CNS:    5 folds, short_gen=8,  pop=50, hc_steps=15
-  Lung:   5 folds, short_gen=6,  pop=25, hc_steps=4
-  Breast: 3 folds, short_gen=5,  pop=25, hc_steps=4
-Pipeline = Filter + Short DE + HC (same as the "Pipeline" column in the tables).
-"""
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
@@ -121,4 +109,4 @@ for name,(path,impute,folds,sg,pop,steps,labels) in CFG.items():
     )
 
 print("\nSaved: cm_cns.png, cm_lung.png, cm_breast.png")
-print("Use the gene counts printed above to update the gene-subset chart.")
+

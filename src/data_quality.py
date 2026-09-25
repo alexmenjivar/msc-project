@@ -10,14 +10,14 @@ DATASETS = {
 
 
 def inspect(name, df):
-    """Step 1 - basic inspection."""
+    """basic inspection."""
     print(f"\n{'='*60}\n{name}\n{'='*60}")
     print(f"Shape: {df.shape[0]} samples x {df.shape[1]-1} genes (+1 class column)")
     print(f"Classes: {dict(df['class'].value_counts())}")
 
 
 def profile_missing(name, X):
-    """Step 2 - missing values per gene, worst-affected."""
+    """missing values per gene, worst-affected."""
     na_per_gene = X.isnull().sum()
     total_missing = int(na_per_gene.sum())
     genes_with_na = int((na_per_gene > 0).sum())
@@ -32,30 +32,30 @@ def profile_missing(name, X):
 
 def clean(name, df):
     """
-    Steps 3-5 - numeric conversion, drop dead/duplicate genes.
+    numeric conversion, drop dead/duplicate genes.
     Returns the cleaned dataframe and a small report dict.
     """
     y = df["class"]
     X = df.drop(columns=["class"])
 
-    # Step 3: force everything numeric; '?' / text / blank -> NaN
+    #force everything numeric; '?' / text / blank -> NaN
     X = X.apply(pd.to_numeric, errors="coerce")
 
     before_genes = X.shape[1]
     missing_before = int(X.isnull().sum().sum())
 
-    # Step 4a: drop genes that are entirely missing (can't impute from nothing)
+    #drop genes that are entirely missing (can't impute from nothing)
     all_missing = X.columns[X.isnull().all()]
     X = X.drop(columns=all_missing)
 
-    # Step 4b: drop constant (zero-variance) genes - no information
-    #          (computed ignoring NaN; a gene with one value + NaNs is constant)
+    #drop constant (zero-variance) genes - no information
+    #(computed ignoring NaN; a gene with one value + NaNs is constant)
     variances = X.var(axis=0, skipna=True)
     constant = variances[variances == 0].index
     X = X.drop(columns=constant)
 
-    # Step 5: drop duplicate probe columns (identical values), keep first
-    #         transpose so duplicated() compares columns, on non-NaN-filled view
+    #drop duplicate probe columns (identical values), keep first
+    #transpose so duplicated() compares columns, on non-NaN-filled view
     dup_mask = X.T.duplicated()
     duplicate_genes = X.columns[dup_mask.values]
     X = X.drop(columns=duplicate_genes)
@@ -77,7 +77,7 @@ def clean(name, df):
 
 
 def report(name, rep):
-    """Step 6 - before/after data-quality report."""
+    """before/after data-quality report."""
     print(f"\n--- Data-quality report: {name} ---")
     print(f"Genes before cleaning: {rep['genes_before']}")
     print(f"Genes after cleaning:  {rep['genes_after']}  "
